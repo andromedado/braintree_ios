@@ -298,9 +298,11 @@ replacementString:(NSString *)string {
                          isBackImage:NO animatedFromRight:newCardNumberRaw.length flips:YES];
     if ([BTPaymentCardUtils isValidNumber:newCardNumberFormatted]) {
         // If card # is valid, give focus to MM/YY text field
-        [scrollView scrollRectToVisible:
-         CGRectMake((newCardType.brand == BTCardBrandAMEX ?BT_AMEX_NUMBER_SCROLL_OFFSET : BT_GENERIC_NUMBER_SCROLL_OFFSET), 0, 100, 30)
-                               animated:YES];
+        //float xOffset = (newCardType.brand == BTCardBrandAMEX ? BT_AMEX_NUMBER_SCROLL_OFFSET : BT_GENERIC_NUMBER_SCROLL_OFFSET);
+        NSRange allButLastFour = { 0, MAX(0, ([newCardNumberFormatted length] - 4)) };
+        NSAttributedString* formattedCardNumber = [self.cardNumberTextField.attributedText attributedSubstringFromRange:allButLastFour];
+        CGFloat xOffset = formattedCardNumber.size.width + 150 + (newCardType.brand == BTCardBrandAMEX ? 3 : 5);//Not sure where the magic 153 comes from
+        [scrollView scrollRectToVisible:CGRectMake(xOffset, 0, 100, 30) animated:YES];
         [monthYearTextField becomeFirstResponder];
         [self setSecondaryTextFieldsHidden:NO];
     }
