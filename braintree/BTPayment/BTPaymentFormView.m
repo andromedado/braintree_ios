@@ -336,10 +336,8 @@ replacementString:(NSString *)string {
         }
         return YES;
     } else if (text.length == 1) {
-        // User has a "1" in the text field already
-        if ([text isEqualToString:@"0"]) {
-            monthYearTextField.text = [NSString stringWithFormat:@"%@%@/", text, string];
-        } else if ([string integerValue] > 2) {
+        // User has a "0"/"1" in the text field already
+        if (([text isEqualToString:@"1"] && [string integerValue] > 2) || ([text isEqualToString:@"0"] && [string integerValue] == 0)) {
             [self shakeView:monthYearTextField completion:nil];
         } else {
             monthYearTextField.text = [NSString stringWithFormat:@"%@%@/", text, string];
