@@ -259,13 +259,16 @@ replacementString:(NSString *)string {
 
 
     NSString *oldCardNumberFormatted = cardNumberTextField.text;
-    BOOL endsWithSpaceOnDelete = [oldCardNumberFormatted hasSuffix:@"  "] && !string.length;
+    BOOL deletingCharacters = string.length == 0;
+
+    if (deletingCharacters && range.length == 1) {
+        while (range.location > 0 && [[oldCardNumberFormatted substringWithRange:NSMakeRange(range.location, 1)] isEqualToString:@" "]) {
+            range.location = range.location - 1;
+            range.length = range.length + 1;
+        }
+    }//User is deleting across white-space
 
     NSString *newCardNumberFormatted = [oldCardNumberFormatted stringByReplacingCharactersInRange:range withString:string];
-    if (endsWithSpaceOnDelete) {
-        // Remove last character on delete
-        newCardNumberFormatted = [newCardNumberFormatted substringToIndex:newCardNumberFormatted.length-2];
-    }
 
     // Remove non-digits
     newCardNumberFormatted = [[newCardNumberFormatted componentsSeparatedByCharactersInSet:
@@ -294,6 +297,19 @@ replacementString:(NSString *)string {
     }
 
     cardNumberTextField.text = newCardNumberFormatted;
+    //Does cursor position fall next to whitespace?
+    //White space to the right - Unacceptable
+    while (range.location < newCardNumberFormatted.length && [[newCardNumberFormatted substringWithRange:NSMakeRange(range.location, 1)] isEqualToString:@" "]) {
+        range.location += 1;
+    }
+
+    NSInteger cursorOffset = range.location;
+    if (!deletingCharacters) {
+        cursorOffset += range.length + string.length;
+    }
+    UITextPosition* cursorPosition = [cardNumberTextField positionFromPosition:[cardNumberTextField beginningOfDocument] offset:cursorOffset];
+    cardNumberTextField.selectedTextRange = [cardNumberTextField textRangeFromPosition:cursorPosition toPosition:cursorPosition];
+
     [self changeCardImageForCardNumber:newCardNumberFormatted
                          isBackImage:NO animatedFromRight:newCardNumberRaw.length flips:YES];
     if ([BTPaymentCardUtils isValidNumber:newCardNumberFormatted]) {
