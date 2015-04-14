@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name                = 'Braintree1stdibs'
+  s.name                = 'Braintree'
   s.summary             = 'The Braintree API helps businesses accept payments online.'
   s.version             = '2.3.3'
   s.license             = 'LICENSES'
